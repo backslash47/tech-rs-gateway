@@ -1,0 +1,87 @@
+name: Checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: pip install clang-format==20.1.8 ruff==0.14.3
+      - run: npm ci
+      - run: python tools/format_cpp.py --check
+      - run: ruff format --check tools tests
+      - run: ruff check tools tests
+      - run: npm run check:web-style
+      - run: npm run test:web-lint
+  documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install tree-sitter==0.26.0 tree-sitter-cpp==0.23.4 tree-sitter-javascript==0.25.0
+      - run: python tools/check_docs.py
+      - run: python -m unittest discover -s tests -p 'test_docs.py' -v
+  host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Host implementation tests
+        run: |
+          python tools/build_assets.py
+          python tools/test_host.py
+      - name: Offline decoder tests
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Decode protocol vectors
+        run: python tools/decode_frames.py tests/fixtures/internet-envelope.hex
+      - name: Every compressed label matches vendor JSON
+        run: python tools/test_labels.py
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install playwright==1.56.0
+      - run: python -m playwright install --with-deps chromium
+      - name: Simulated UI tests (no network or devices)
+        env:
+          RUN_WEB_TESTS: '1'
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+  reference-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: python tools/build_assets.py
+      - run: esphome compile config/esp32-c3-lpkit.yaml
+  mqtt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install amqtt==0.11.3 paho-mqtt==2.1.0
+      - name: Local broker and simulated controller integration
+        env:
+          RUN_MQTT_TESTS: '1'
+        run: python -m unittest discover -s tests -p 'test_mqtt_broker.py' -v

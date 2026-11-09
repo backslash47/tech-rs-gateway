@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="500" viewBox="0 0 1000 500">
+  <title>Reference six-contact plug: local contact numbering</title>
+  <desc>Gold-contact side facing the viewer, latch behind, cable down. Local positions left to right: red supply, grey unused, yellow ground, green controller TX, brown unused, white controller RX. This is the measured reference cable, not a universal vendor pinout.</desc>
+  <rect width="1000" height="500" fill="white"/>
+  <g font-family="sans-serif" fill="#213547">
+    <text x="35" y="36" font-size="22" font-weight="bold">Reference cable · contact-side view</text>
+    <text x="35" y="64" font-size="15">Gold contacts facing you · latch behind · cable down</text>
+    <rect x="70" y="100" width="360" height="220" rx="12" fill="#edf2f6" stroke="#8297a8" stroke-width="2"/>
+    <path d="M190 320 V460 H310 V320" fill="#dae1e6" stroke="#8297a8" stroke-width="2"/>
+    <g fill="#d6ad42" stroke="#886725">
+      <rect x="95" y="135" width="30" height="85"/><rect x="151" y="135" width="30" height="85"/>
+      <rect x="207" y="135" width="30" height="85"/><rect x="263" y="135" width="30" height="85"/>
+      <rect x="319" y="135" width="30" height="85"/><rect x="375" y="135" width="30" height="85"/>
+    </g>
+    <g font-size="18" font-weight="bold" text-anchor="middle">
+      <text x="110" y="123">1</text><text x="166" y="123">2</text><text x="222" y="123">3</text>
+      <text x="278" y="123">4</text><text x="334" y="123">5</text><text x="390" y="123">6</text>
+    </g>
+    <g stroke-width="8" fill="none">
+      <path d="M110 225 V280 L200 350 V445" stroke="#cd3f40"/>
+      <path d="M166 225 V273 L220 350 V445" stroke="#92999e"/>
+      <path d="M222 225 V273 L240 350 V445" stroke="#d5b822"/>
+      <path d="M278 225 V273 L260 350 V445" stroke="#40945f"/>
+      <path d="M334 225 V273 L280 350 V445" stroke="#8c6349"/>
+      <path d="M390 225 V280 L300 350 V445" stroke="#bac6d1"/>
+    </g>
+    <g font-size="17">
+      <text x="490" y="134" font-weight="bold">Local position → tested cable → function</text>
+      <text x="490" y="177">1 · Red · +12.44 V supply — leave isolated</text>
+      <text x="490" y="215">2 · Grey · unused in this gateway</text>
+      <text x="490" y="253">3 · Yellow · GND</text>
+      <text x="490" y="291">4 · Green · controller TX → MAX input</text>
+      <text x="490" y="329">5 · Brown · unused in this gateway</text>
+      <text x="490" y="367">6 · White · controller RX ← MAX output</text>
+    </g>
+    <text x="490" y="417" font-size="14">Local numbering follows the recorded continuity check.</text>
+    <text x="490" y="441" font-size="14">Do not transfer these numbers to a socket or latch-side view.</text>
+    <text x="35" y="484" font-size="14">Other cables may reverse positions or use different colors. Unused does not mean electrically disconnected inside TECH.</text>
+  </g>
+</svg>

@@ -1,0 +1,5 @@
+# Minimal protocol vectors, manually transcribed from observed wire constants.
+# See README.md. No controller identity or network metadata.
+02 26 ff f4 17 88 00 00 02 18 5d 9f
+02 26 ff f4 17 88 01 01 02 18 55 ce
+02 26 ff f4 04 00 00 04 02 01 ff ff 17 88 00 02 03 02 00 00 02 18 a9 8f

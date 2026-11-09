@@ -1,0 +1,12 @@
+# Project capture, 2026-10-26. Selected mid-session write exchange.
+# TX/RX are relative to the gateway. No timestamps, network or identity metadata.
+# TX: announce 17-byte 0049 transfer
+02 26 ff f4 17 88 00 06 04 00 00 00 ff ff 00 00 04 00 00 08 01 01 00 00 00 49 00 11 02 18 1f db
+# RX: ready
+02 26 ff f4 04 00 00 04 02 01 ff ff 17 88 00 02 03 02 00 00 02 18 a9 8f
+# TX: <X|0.0.1|8307,34>
+02 26 ff f4 17 88 00 06 04 00 00 00 ff ff 00 00 04 00 00 13 03 01 3c 58 7c 30 2e 30 2e 31 7c 38 33 30 37 2c 33 34 3e 00 02 18 a3 b2
+# RX: 17 bytes accepted at transport level
+02 26 ff f4 04 00 00 06 04 00 11 03 ff ff 00 00 17 88 00 02 03 02 00 00 02 18 b1 5d
+# TX: explicit transfer end
+02 26 ff f4 17 88 00 06 04 00 00 00 ff ff 00 00 04 00 00 02 03 01 00 00 02 18 c7 8b

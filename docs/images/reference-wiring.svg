@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="480" viewBox="0 0 1100 480">
+  <title>Signal wiring: ESP32-C3-LPKit v4.0, MAX3232 and TECH controller</title>
+  <desc>ESP GPIO3 transmits through MAX3232 to controller RX. Controller TX returns through MAX3232 to GPIO5. The converter uses switched 3.3 volt power and all three devices share ground. USB powers the ESP; controller power remains disconnected.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse">
+      <path d="M0 0 L8 4 L0 8 Z" fill="context-stroke"/>
+    </marker>
+  </defs>
+  <rect width="1100" height="480" fill="#ffffff"/>
+  <g font-family="sans-serif" fill="#213547">
+    <text x="40" y="35" font-size="22" font-weight="bold">TECH RS gateway · reference wiring</text>
+    <text x="40" y="61" font-size="14">Signal-level schematic; not a numbered RJ12 pinout or a physical board layout.</text>
+    <g fill="#f4f7fa" stroke="#afbdca" stroke-width="1.5">
+      <rect x="40" y="90" width="275" height="300" rx="12"/>
+      <rect x="415" y="90" width="270" height="300" rx="12"/>
+      <rect x="785" y="90" width="275" height="300" rx="12"/>
+    </g>
+    <g font-size="17" font-weight="bold" text-anchor="middle">
+      <text x="177" y="119">ESP32-C3-LPKit v4.0</text>
+      <text x="550" y="119">MAX3232</text>
+      <text x="922" y="119">TECH · RS MODUŁY</text>
+    </g>
+    <g font-size="13" text-anchor="middle" fill="#536778">
+      <text x="177" y="142">USB power · 9600 8N1</text>
+      <text x="455" y="142">TTL</text>
+      <text x="643" y="142">RS232</text>
+      <text x="922" y="142">Main mode · Internet module ON</text>
+    </g>
+    <g font-size="14">
+      <text x="60" y="184">GPIO3 · UART TX</text>
+      <text x="430" y="184">T input</text>
+      <text x="603" y="184">T output</text>
+      <text x="802" y="184">RX · white on tested cable</text>
+      <text x="60" y="244">GPIO5 · UART RX</text>
+      <text x="430" y="244">R output</text>
+      <text x="603" y="244">R input</text>
+      <text x="802" y="244">TX · green on tested cable</text>
+      <text x="60" y="304">Switched 3.3 V rail</text>
+      <text x="430" y="304">VCC · 3.3 V</text>
+      <text x="802" y="304">+12 V · NOT CONNECTED</text>
+      <text x="60" y="364">GND</text>
+      <text x="430" y="364">GND</text>
+      <text x="802" y="364">GND · yellow on tested cable</text>
+    </g>
+    <g fill="none" stroke-width="2.5">
+      <path d="M235 180 H407 M687 180 H777" stroke="#267ca3" marker-end="url(#arrow)"/>
+      <path d="M777 240 H687 M407 240 H235" stroke="#389066" marker-end="url(#arrow)"/>
+      <path d="M235 300 H407" stroke="#bb6240" marker-end="url(#arrow)"/>
+      <path d="M235 360 H407 M687 360 H777" stroke="#657583"/>
+    </g>
+    <text x="40" y="421" font-size="14">LPKit v4.0 only: GPIO4 HIGH enables the peripheral 3.3 V supply. Other ESP32 boards differ.</text>
+    <text x="40" y="447" font-size="14">Colors apply to the reference cable only. Verify connector orientation and signals before wiring.</text>
+    <text x="40" y="470" font-size="13" fill="#536778">MAX3232 provides voltage-level conversion, not galvanic isolation. Do not connect TECH directly to ESP GPIO.</text>
+  </g>
+</svg>

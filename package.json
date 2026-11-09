@@ -1,0 +1,17 @@
+{
+    "name": "tech-rs-gateway-development",
+    "private": true,
+    "engines": {
+        "node": ">=22"
+    },
+    "scripts": {
+    "format:web": "eslint --fix web/*.js && prettier --write web/*.js web/*.css web/*.html web/locales/*.json eslint.config.mjs tools/lint_web.mjs tests/test_web_lint.mjs",
+    "check:web-style": "eslint web/*.js && prettier --check web/*.js web/*.css web/*.html web/locales/*.json eslint.config.mjs tools/lint_web.mjs tests/test_web_lint.mjs && node tools/lint_web.mjs",
+        "lint:web": "node tools/lint_web.mjs",
+        "test:web-lint": "node --test tests/test_web_lint.mjs"
+    },
+    "devDependencies": {
+        "eslint": "9.39.1",
+        "prettier": "3.6.2"
+    }
+}

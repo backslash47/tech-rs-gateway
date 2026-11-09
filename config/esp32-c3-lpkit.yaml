@@ -1,0 +1,74 @@
+# Reference hardware: LaskaKit ESP32-C3-LPKit v4.0 + MAX3232.
+# See docs/installation.md for build and upload instructions.
+substitutions:
+  device_name: tech-rs-gateway
+  uart_rx_pin: GPIO5
+  uart_tx_pin: GPIO3
+  peripheral_enable_pin: GPIO4
+  experimental_actions: 'false'
+
+esphome:
+  name: ${device_name}
+  friendly_name: TECH RS gateway
+  includes:
+    - ../components/tech_rs_gateway/
+    - ../components/tech_rs_gateway/gateway.h
+  on_boot:
+    priority: -100
+    then:
+      - lambda: TechGateway::instance().start(id(tech_uart), ${experimental_actions});
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf
+    sdkconfig_options:
+      CONFIG_LWIP_MAX_SOCKETS: '24'
+
+wifi:
+  ap:
+    ssid: TECH RS Setup
+  reboot_timeout: 0s
+captive_portal:
+
+# Service/logging access, not a second Home Assistant entity integration.
+api:
+  reboot_timeout: 0s
+ota:
+  - platform: esphome
+logger:
+  hardware_uart: USB_SERIAL_JTAG
+  level: INFO
+
+# Dependency only. The dynamic MQTT bridge owns its own client and settings.
+mqtt:
+  broker: ''
+  enable_on_boot: false
+  discovery: false
+  discover_ip: false
+  topic_prefix: null
+  log_topic: null
+  reboot_timeout: 0s
+
+# LPKit v4.0 ONLY: GPIO4 switches the peripheral 3.3 V supply.
+switch:
+  - platform: gpio
+    id: peripheral_power
+    internal: true
+    pin: ${peripheral_enable_pin}
+    restore_mode: ALWAYS_ON
+
+uart:
+  id: tech_uart
+  rx_pin: ${uart_rx_pin}
+  tx_pin: ${uart_tx_pin}
+  baud_rate: 9600
+  data_bits: 8
+  parity: NONE
+  stop_bits: 1
+  rx_buffer_size: 2048
+
+interval:
+  - interval: 5ms
+    then:
+      - lambda: TechGateway::instance().loop();

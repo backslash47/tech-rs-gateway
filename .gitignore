@@ -1,0 +1,41 @@
+# Machine-specific configuration and credentials
+secrets.yaml
+secrets.*.yaml
+!secrets.example.yaml
+.env
+.env.*
+!.env.example
+local/
+config/*-local.yaml
+private/
+*.key
+*.pem
+
+# Build products and tools
+.esphome/
+.pio/
+.venv/
+# Dependencies are managed through requirements-dev.txt, not an implicit uv project.
+uv.lock
+__pycache__/
+node_modules/
+build/
+dist/
+*.bin
+*.elf
+*.map
+.DS_Store
+
+# Unreviewed research and vendor data do not belong in the public tree
+research/
+captures/raw/
+*.logicdata
+*.logicsettings
+*.zip
+*.log
+emodul-*.json
+dynamic_menu_assets.h
+label_dictionary_data.h
+label_dictionary_data.cpp
+dynamic_menu_assets.cpp
+build_info.h

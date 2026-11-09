@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>TECH · controller menu</title>
+
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <header>
+            <h1>
+                TECH
+                <span class="muted">· menu</span>
+            </h1>
+            <div class="head-tools">
+                <span id="connection">…</span>
+                <select id="language" aria-label="Language">
+                    <option value="cs">Čeština</option>
+                    <option value="pl">Polski</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </header>
+        <nav id="tabs"></nav>
+        <div class="tools">
+            <input id="search" type="search" placeholder="Search name or ID…" />
+            <label>
+                <input id="hidden" type="checkbox" />
+                <span id="hidden-label">Include hidden items</span>
+            </label>
+            <button id="refresh">Refresh</button>
+        </div>
+        <p id="status" aria-live="polite">Loading…</p>
+        <p id="message" role="alert"></p>
+        <main id="menu"></main>
+        <div class="footer"><button id="about">ⓘ</button></div>
+        <div class="footer"><button id="mqtt-open">MQTT</button></div>
+        <dialog id="detail">
+            <button id="detail-close" aria-label="Close">✕</button>
+            <h2 id="detail-title"></h2>
+            <dl id="detail-meta"></dl>
+            <details id="detail-raw">
+                <summary id="raw-title"></summary>
+                <pre id="raw-text"></pre>
+            </details>
+            <div id="about-text" class="gone">
+                <p id="intro"></p>
+                <p id="help" class="muted"></p>
+            </div>
+        </dialog>
+        <dialog id="complex">
+            <button id="complex-close" aria-label="Close">✕</button>
+            <h2 id="complex-title"></h2>
+            <div id="complex-body" class="complex-scroll"></div>
+            <div id="complex-actions" class="dialog-buttons"></div>
+        </dialog>
+
+        <dialog id="mqtt-dialog">
+            <button id="mqtt-close" aria-label="Close">✕</button>
+            <h2>MQTT</h2>
+            <p id="mqtt-state"></p>
+            <form id="mqtt-form">
+                <div class="complex-scroll">
+                    <label class="check">
+                        <input id="mq-enabled" type="checkbox" />
+                        <span data-mq="enabled"></span>
+                    </label>
+                    <label class="mqtt-field">
+                        <span data-mq="host"></span>
+                        <input
+                            id="mq-host"
+                            maxlength="127"
+                            placeholder="mqtt.example.local"
+                            autocomplete="off"
+                        />
+                    </label>
+                    <label class="mqtt-field">
+                        <span data-mq="port"></span>
+                        <input
+                            id="mq-port"
+                            type="number"
+                            min="1"
+                            max="65535"
+                            required
+                            value="1883"
+                        />
+                    </label>
+                    <label class="mqtt-field">
+                        <span data-mq="user"></span>
+                        <input id="mq-user" maxlength="63" autocomplete="username" />
+                    </label>
+                    <label class="mqtt-field">
+                        <span data-mq="password"></span>
+                        <input
+                            id="mq-password"
+                            type="password"
+                            maxlength="127"
+                            autocomplete="new-password"
+                        />
+                    </label>
+                    <label class="check">
+                        <input id="mq-clear" type="checkbox" />
+                        <span data-mq="clear"></span>
+                    </label>
+                    <label class="mqtt-field">
+                        <span data-mq="prefix"></span>
+                        <input id="mq-prefix" maxlength="95" required pattern="[A-Za-z0-9_/-]+" />
+                    </label>
+                    <label class="check">
+                        <input id="mq-discovery" type="checkbox" />
+                        <span data-mq="discovery"></span>
+                    </label>
+                    <label class="check">
+                        <input id="mq-commands" type="checkbox" />
+                        <span data-mq="commands"></span>
+                    </label>
+                    <small data-mq="hint"></small>
+                    <small id="mq-topics"></small>
+                </div>
+                <p id="mqtt-error" role="status"></p>
+                <div class="dialog-buttons">
+                    <button id="mq-save" type="submit" class="save"></button>
+                </div>
+            </form>
+        </dialog>
+        <script src="locales.js"></script>
+        <script src="build-info.js"></script>
+        <script src="menu-complex.js"></script>
+        <script src="dictionary.js"></script>
+        <script src="state.js"></script>
+        <script src="ui.js"></script>
+        <script src="menu-api.js"></script>
+        <script src="menu-editors.js"></script>
+        <script src="menu-renderer.js"></script>
+        <script src="menu-dialogs.js"></script>
+        <script src="mqtt-settings.js"></script>
+        <script src="app.js"></script>
+    </body>
+</html>
