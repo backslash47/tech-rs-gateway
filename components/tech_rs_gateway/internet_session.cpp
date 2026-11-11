@@ -334,11 +334,23 @@ void InternetSession::respond(const Frame& frame, uint32_t now, const Sender& se
         route->size() == 4 && (*route)[0] == 2 && (*route)[2] == 0xff && (*route)[3] == 0xff;
     const bool long_route =
         route->size() == 6 && (*route)[0] == 4 && (*route)[4] == 0xff && (*route)[5] == 0xff;
+    // A cold controller can announce its initial transfer before there is anything to ACK.
+    const bool cold_start = route->empty() && data->size() == 8 &&
+                            word(data->data()) == protocol::ANNOUNCE &&
+                            word(&(*data)[4]) == protocol::STARTUP_TRANSFER;
 
-    if (!short_route && !long_route) {
+    if (!short_route && !long_route && !cold_start) {
         stop();
         log("Invalid route acknowledgment");
         return;
+    }
+
+    if (cold_start && (initialized_ || init_step_ != InitStep::Preamble)) {
+        start(now);
+
+        if (callbacks_.restarted) {
+            callbacks_.restarted();
+        }
     }
 
     if (data->size() < 2) {

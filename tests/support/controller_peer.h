@@ -66,7 +66,7 @@ struct ControllerPeer {
         frame({4, 0, 0, 0, 0xff, 0xff}, {3, 1});
     }
 
-    void initialize(bool restart_service = true) {
+    void initialize(bool restart_service = true, bool cold_start = false) {
         service.configure_network({2, 0, 0, 0, 0, 1}, {192, 0, 2, 10}, {255, 255, 255, 0},
                                   {192, 0, 2, 1}, {192, 0, 2, 1});
 
@@ -74,13 +74,32 @@ struct ControllerPeer {
             service.restart(now);
         }
 
-        // Fragmented bootstrap, without assigning any private session state.
-        for (const auto byte : tech_rs_gateway::encode_bootstrap(0xfff4, 0)) {
-            bytes({byte});
+        if (cold_start) {
+            // Captured startup announcement with an explicitly empty acknowledgment.
+            const Bytes announcement{0x02, 0x26, 0xff, 0xf4, 0x04, 0x00, 0x00, 0x00,
+                                     0x17, 0x88, 0x00, 0x08, 0x01, 0x01, 0x00, 0x00,
+                                     0x00, 0x01, 0x02, 0x00, 0x02, 0x18, 0xdc, 0xd1};
+            const auto count = transmitted.size();
+
+            for (const auto byte : announcement) {
+                bytes({byte});
+            }
+
+            assert(transmitted.size() == count + 1);
+            tech_rs_gateway::Frame reply;
+            assert(tech_rs_gateway::decode(transmitted.back(), reply));
+            assert(reply.fields[0].tag == 0x1788);
+            assert(reply.fields[0].value == Bytes({2, 1, 0xff, 0xff}));
+        } else {
+            // Fragmented bootstrap, without assigning any private session state.
+            for (const auto byte : tech_rs_gateway::encode_bootstrap(0xfff4, 0)) {
+                bytes({byte});
+            }
+
+            assert(transmitted.back() == tech_rs_gateway::encode_bootstrap(0xfff4, 0x0101));
+            idle();
         }
 
-        assert(transmitted.back() == tech_rs_gateway::encode_bootstrap(0xfff4, 0x0101));
-        idle();
         assert(last_data() == Bytes({3, 1, 0}));
         idle();
         assert(last_data() == Bytes({3, 1}));

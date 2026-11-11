@@ -20,6 +20,7 @@ constexpr uint16_t MODULE_TAG = 0x1788;
 constexpr uint16_t ANNOUNCE = 0x0101;
 constexpr uint16_t DATA = 0x0301;
 constexpr uint16_t IDLE = 0x0302;
+constexpr uint16_t STARTUP_TRANSFER = 0x0001;
 constexpr uint16_t TEXT_TRANSFER = 0x0049;
 constexpr uint16_t BINARY_TRANSFER = 0x0050;
 constexpr size_t MAX_FRAME_BYTES = 4096;
