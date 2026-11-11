@@ -51,15 +51,14 @@ jobs:
       - name: Every compressed label matches vendor JSON
         run: python tools/test_labels.py
   web:
-    # Match the supported Linux releases of the pinned Playwright version.
     runs-on: ubuntu-24.04
+    # Keep browser binaries and OS dependencies aligned with the Python package.
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.56.0-noble
+      options: --ipc=host
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
       - run: pip install playwright==1.56.0
-      - run: python -m playwright install --with-deps chromium
       - name: Simulated UI tests (no network or devices)
         env:
           RUN_WEB_TESTS: '1'
