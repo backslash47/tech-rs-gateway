@@ -131,7 +131,8 @@ std::optional<MqttProjection> project_mqtt_item(const ItemSnapshot& snapshot,
     }
 
     if (su && type == overview_type::TEMPERATURE) {
-        d += ",\"device_class\":\"temperature\",\"unit_of_measurement\":\"°C\"";
+        d += ",\"device_class\":\"temperature\",\"unit_of_measurement\":\"°C\",\"state_class\":"
+             "\"measurement\"";
     } else if (su && type == overview_type::VALVE) {
         d += ",\"unit_of_measurement\":\"%\",\"state_class\":\"measurement\"";
     } else if (!su && type == menu_type::NUMBER &&

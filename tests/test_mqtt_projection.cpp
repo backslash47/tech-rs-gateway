@@ -49,13 +49,20 @@ int main() {
     item = service.next_item("", peer.now);
     assert(project_mqtt_item(*item, settings, "test_device", label)->value == "31");
     settings.commands = false;
-    assert(project_mqtt_item(*item, settings, "test_device", label)->component == "sensor");
+    projected = project_mqtt_item(*item, settings, "test_device", label);
+    assert(projected && projected->component == "sensor");
+    assert(projected->discovery.find("\"state_class\"") == std::string::npos);
     assert(route_mqtt_command(service, topic, "32", settings, false, peer.now)->code ==
            ResultCode::CommandsDisabled);
     peer.text("<SU|1.0.0|1|501,0,1,1,0,759,not-a-temperature>");
     item = service.next_item("SU:0", peer.now);
     projected = project_mqtt_item(*item, settings, "test_device", label);
     assert(projected && !projected->available && projected->value.empty());
+    peer.text("<SU|1.0.0|0|501,0,1,1,0,759,215>");
+    item = service.next_item("SU:0", peer.now);
+    projected = project_mqtt_item(*item, settings, "test_device", label);
+    assert(projected && projected->available && projected->component == "sensor");
+    assert(projected->discovery.find("\"state_class\":\"measurement\"") != std::string::npos);
     std::cout << "PASS: MQTT Discovery projection, retained replay, validation and headless "
                  "write/readback\n";
 }
