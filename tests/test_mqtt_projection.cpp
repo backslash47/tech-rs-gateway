@@ -66,6 +66,7 @@ int main() {
     peer.text(
         "<SU|1.0.0|1|6016,0,23,1,0,101,275,0,0,50,1,0,0,32|7024,0,23,1,0,102,341,0,0,85,0,0,0,40>");
     settings.commands = true;
+
     for (bool second : {false, true}) {
         item = service.next_item(second ? "SU:6016" : "SU:6015", peer.now);
         const std::string id = second ? "7024" : "6016";
@@ -87,15 +88,18 @@ int main() {
         assert(pump.discovery_topic ==
                    "homeassistant/binary_sensor/test_device/SU_" + id + "_pump/config" &&
                pump.value == (second ? "OFF" : "ON"));
+
         for (const auto* p : {&temp, &target, &pump}) {
             assert(p->available && p->base.rfind(opening.base + "/", 0) == 0 &&
                    p->discovery.find("command_topic") == std::string::npos);
         }
+
         peer.text("<SU|1.0.0|0|" + id + ",0,23,1,0,101,-2000,0,0,50,9,0,0,32>");
         item = service.next_item(second ? "SU:6016" : "SU:6015", peer.now);
         assert(!field(MqttChannel::Temperature).available && !field(MqttChannel::Pump).available &&
                field(MqttChannel::TargetTemperature).available);
     }
+
     std::cout << "PASS: MQTT Discovery projection, retained replay, validation and headless "
                  "write/readback\n";
 }

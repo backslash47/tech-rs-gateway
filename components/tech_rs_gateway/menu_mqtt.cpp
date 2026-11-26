@@ -143,9 +143,11 @@ void MenuMqtt::tick(uint32_t now) {
                 const auto slash = it->first.find('_');
                 auto tail = it->first.substr(slash + 1);
                 const auto field = tail.find('_');
+
                 if (field != std::string::npos) {
                     tail[field] = '/';
                 }
+
                 const auto path =
                     std::string(active.prefix) + "/menu/" + it->first.substr(0, slash) + "/" + tail;
                 publish(path + "/availability", "offline", true);
@@ -338,23 +340,27 @@ void MenuMqtt::publish_item(const tech_rs_gateway::ItemSnapshot& snapshot, uint3
             std::string(active.prefix) + "/menu/" + record.menu + "/" +
             std::to_string(DynamicMenu::field(record, tech_rs_gateway::menu_field::ID));
         publish(base + "/availability", "offline", true);
+
         if (record.menu == "SU" && DynamicMenu::field(record, tech_rs_gateway::menu_field::TYPE) ==
                                        tech_rs_gateway::overview_type::VALVE) {
             for (const char* field : {"temperature", "target_temperature", "pump"}) {
                 publish(base + "/" + field + "/availability", "offline", true);
             }
         }
+
         return;
     }
 
     publish_projection(*projected, snapshot.visible, false, now);
     using namespace tech_rs_gateway;
+
     if (snapshot.record.menu == "SU" &&
         DynamicMenu::field(snapshot.record, menu_field::TYPE) == overview_type::VALVE) {
         for (const auto channel :
              {MqttChannel::Temperature, MqttChannel::TargetTemperature, MqttChannel::Pump}) {
             const auto field =
                 project_mqtt_item(snapshot, active, identity, mqtt_menu_label, channel);
+
             if (field) {
                 publish_projection(*field, snapshot.visible, true, now);
             }
@@ -382,10 +388,12 @@ void MenuMqtt::publish_projection(const tech_rs_gateway::MqttProjection& item, b
             if (!record.cleaned && publish(item.discovery_topic, "", true)) {
                 record.cleaned = 1;
             }
+
             return;
         }
     } else {
         unsigned bit = 1;
+
         for (const char* kind : {"sensor", "number", "switch", "select"}) {
             if (!tech_rs_gateway::obsolete_discovery_type(kind, component, active.discovery)) {
                 record.cleaned |= bit;

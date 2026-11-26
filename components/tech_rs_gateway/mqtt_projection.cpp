@@ -25,9 +25,11 @@ std::optional<MqttProjection> project_mqtt_item(const ItemSnapshot& snapshot,
     const bool writable = snapshot.writable;
     const bool su = i.menu == "SU";
     const bool valve = su && type == overview_type::VALVE;
+
     if (channel != MqttChannel::Primary && !valve) {
         return std::nullopt;
     }
+
     std::string component, value;
 
     if (!su && type >= menu_type::NUMBER && type <= menu_type::OTHER_NUMBER && i.f.size() > 9) {
@@ -65,31 +67,39 @@ std::optional<MqttProjection> project_mqtt_item(const ItemSnapshot& snapshot,
         component = "sensor";
         const char* suffix = nullptr;
         int v;
+
         switch (channel) {
         case MqttChannel::Primary:
             if (DynamicMenu::integer(i.f[overview_field::OPENING], v) && v >= 0 && v <= 100) {
                 value = std::to_string(v);
             }
+
             break;
         case MqttChannel::Temperature:
         case MqttChannel::TargetTemperature: {
             const bool actual = channel == MqttChannel::Temperature;
             suffix = actual ? "temperature" : "target_temperature";
+
             if (DynamicMenu::integer(
                     i.f[actual ? overview_field::TEMPERATURE : overview_field::TARGET], v) &&
                 v != -2030 && v != -2000) {
                 value = actual ? std::to_string(v / 10.0f) : std::to_string(v);
             }
+
             break;
         }
+
         case MqttChannel::Pump:
             suffix = "pump";
             component = "binary_sensor";
+
             if (DynamicMenu::integer(i.f[overview_field::PUMP], v) && (v == 0 || v == 1)) {
                 value = v ? "ON" : "OFF";
             }
+
             break;
         }
+
         if (suffix) {
             node += std::string("_") + suffix;
             base += std::string("/") + suffix;
