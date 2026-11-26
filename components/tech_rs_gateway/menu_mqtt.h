@@ -3,6 +3,7 @@
 #include "esphome/core/preferences.h"
 #include "menu_snapshot.h"
 #include "mqtt_client.h"
+#include "mqtt_projection.h"
 #include "mqtt_settings.h"
 #include <atomic>
 #include <deque>
@@ -95,4 +96,6 @@ class MenuMqtt {
     void command(const Command& c, uint32_t now);
 
     void publish_item(const tech_rs_gateway::ItemSnapshot& snapshot, uint32_t now);
+    void publish_projection(const tech_rs_gateway::MqttProjection& item, bool visible, bool derived,
+                            uint32_t now);
 };

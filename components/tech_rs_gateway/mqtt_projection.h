@@ -17,6 +17,9 @@ bool obsolete_discovery_type(const std::string& existing, const std::string& des
 
 using LabelResolver = std::function<std::string(int)>;
 
+/// Primary keeps the historical item identity; other channels exist only for valve overviews.
+enum class MqttChannel { Primary, Temperature, TargetTemperature, Pump };
+
 /**
  * @brief Owns MQTT topic/payload projections; publishing and Discovery lifecycle remain with the
  * adapter.
@@ -32,13 +35,15 @@ struct MqttProjection {
  * @param settings Topic prefix and command policy; the caller decides whether Discovery is enabled.
  * @param identity Stable gateway identity used in Discovery unique IDs.
  * @param label Synchronous description-code resolver; must be safe on the calling thread.
+ * @param channel Read-only valve field, or Primary for the original item.
  * @return Owned projection, or nullopt for an unsupported record or invalid numeric metadata.
  * @note Pure with respect to the controller and broker. No publication or command is performed.
  */
 std::optional<MqttProjection> project_mqtt_item(const ItemSnapshot& item,
                                                 const MqttSettings& settings,
                                                 const std::string& identity,
-                                                const LabelResolver& label);
+                                                const LabelResolver& label,
+                                                MqttChannel channel = MqttChannel::Primary);
 
 /**
  * @brief Routes a scalar MQTT command through shared service validation.

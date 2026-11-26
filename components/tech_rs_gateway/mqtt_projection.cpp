@@ -12,18 +12,22 @@ bool obsolete_discovery_type(const std::string& existing, const std::string& des
 std::optional<MqttProjection> project_mqtt_item(const ItemSnapshot& snapshot,
                                                 const MqttSettings& settings,
                                                 const std::string& identity,
-                                                const LabelResolver& resolve_label) {
+                                                const LabelResolver& resolve_label,
+                                                MqttChannel channel) {
     const auto& i = snapshot.record;
     const auto& key = snapshot.key;
     const auto q = DynamicMenu::quote;
     const int type = DynamicMenu::field(i, menu_field::TYPE),
               id = DynamicMenu::field(i, menu_field::ID);
-    const std::string node = i.menu + "_" + std::to_string(id);
-    const std::string base =
-        std::string(settings.prefix) + "/menu/" + i.menu + "/" + std::to_string(id);
+    std::string node = i.menu + "_" + std::to_string(id);
+    std::string base = std::string(settings.prefix) + "/menu/" + i.menu + "/" + std::to_string(id);
     const std::string availability = std::string(settings.prefix) + "/availability";
     const bool writable = snapshot.writable;
     const bool su = i.menu == "SU";
+    const bool valve = su && type == overview_type::VALVE;
+    if (channel != MqttChannel::Primary && !valve) {
+        return std::nullopt;
+    }
     std::string component, value;
 
     if (!su && type >= menu_type::NUMBER && type <= menu_type::OTHER_NUMBER && i.f.size() > 9) {
@@ -57,10 +61,39 @@ std::optional<MqttProjection> project_mqtt_item(const ItemSnapshot& snapshot,
     } else if (su && type == overview_type::STATE && i.f.size() > 4) {
         component = "sensor";
         value = resolve_label(DynamicMenu::field(i, overview_field::STATE_OR_VERSION));
-    } else if (su && type == overview_type::VALVE && i.f.size() > 13) {
+    } else if (valve && i.f.size() > overview_field::TARGET) {
         component = "sensor";
-        const int opening = DynamicMenu::field(i, overview_field::OPENING);
-        value = opening >= 0 && opening <= 100 ? std::to_string(opening) : "";
+        const char* suffix = nullptr;
+        int v;
+        switch (channel) {
+        case MqttChannel::Primary:
+            if (DynamicMenu::integer(i.f[overview_field::OPENING], v) && v >= 0 && v <= 100) {
+                value = std::to_string(v);
+            }
+            break;
+        case MqttChannel::Temperature:
+        case MqttChannel::TargetTemperature: {
+            const bool actual = channel == MqttChannel::Temperature;
+            suffix = actual ? "temperature" : "target_temperature";
+            if (DynamicMenu::integer(
+                    i.f[actual ? overview_field::TEMPERATURE : overview_field::TARGET], v) &&
+                v != -2030 && v != -2000) {
+                value = actual ? std::to_string(v / 10.0f) : std::to_string(v);
+            }
+            break;
+        }
+        case MqttChannel::Pump:
+            suffix = "pump";
+            component = "binary_sensor";
+            if (DynamicMenu::integer(i.f[overview_field::PUMP], v) && (v == 0 || v == 1)) {
+                value = v ? "ON" : "OFF";
+            }
+            break;
+        }
+        if (suffix) {
+            node += std::string("_") + suffix;
+            base += std::string("/") + suffix;
+        }
     } else {
         return std::nullopt;
     }
@@ -70,7 +103,14 @@ std::optional<MqttProjection> project_mqtt_item(const ItemSnapshot& snapshot,
                        " · " + key;
 
     if (su && type == overview_type::VALVE) {
-        name = resolve_label(3842) + " · " + key;
+        if (channel == MqttChannel::Primary) {
+            name = resolve_label(3842) + " · " + key;
+        } else {
+            const int quantity = channel == MqttChannel::Pump          ? 585
+                                 : channel == MqttChannel::Temperature ? 3865
+                                                                       : 759;
+            name += " · " + resolve_label(quantity);
+        }
     }
 
     if (!su && type == menu_type::RAW_NUMBER) {
@@ -89,7 +129,7 @@ std::optional<MqttProjection> project_mqtt_item(const ItemSnapshot& snapshot,
         "],\"name\":\"TECH RS bridge\",\"manufacturer\":\"Local TECH bridge\",\"sw_version\":" +
         q(build::SOFTWARE_VERSION) + "}";
 
-    if (component != "sensor") {
+    if (component != "sensor" && component != "binary_sensor") {
         d += ",\"command_topic\":" + q(base + "/set") + ",\"retain\":false";
     }
 
@@ -130,10 +170,12 @@ std::optional<MqttProjection> project_mqtt_item(const ItemSnapshot& snapshot,
              ",\"command_template\":" + q("{{ " + reverse + "[value] }}");
     }
 
-    if (su && type == overview_type::TEMPERATURE) {
+    if ((su && type == overview_type::TEMPERATURE) || channel == MqttChannel::Temperature) {
         d += ",\"device_class\":\"temperature\",\"unit_of_measurement\":\"°C\",\"state_class\":"
              "\"measurement\"";
-    } else if (su && type == overview_type::VALVE) {
+    } else if (channel == MqttChannel::TargetTemperature) {
+        d += ",\"device_class\":\"temperature\",\"unit_of_measurement\":\"°C\"";
+    } else if (valve && channel == MqttChannel::Primary) {
         d += ",\"unit_of_measurement\":\"%\",\"state_class\":\"measurement\"";
     } else if (!su && type == menu_type::NUMBER &&
                DynamicMenu::field(i, menu_field::UNIT) == 1035) {

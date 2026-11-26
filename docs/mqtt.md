@@ -85,6 +85,13 @@ actions can only be invoked through an enabled web confirmation dialog.
 
 ## Discovery defaults
 
+Each valve overview (SU type 23) retains its opening percentage and raw attributes
+at the original item topic. Three read-only channels below the same item base
+(`temperature`, `target_temperature`, `pump`) publish their own retained `/state`
+and `/availability`. Discovery exposes measured water temperature (°C, measurement),
+reported target (°C) and pump status (binary sensor). IDs are scoped to the gateway
+and controller item ID, so multiple valves remain distinct regardless of menu order.
+
 - Supported scalar items are discovered automatically.
 - MU and SU entities are enabled by default; MI and MS entities are disabled by
   default in HA to avoid filling dashboards with installation/service controls.
