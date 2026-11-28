@@ -1,0 +1,21 @@
+# Standalone USB-flashed diagnostic for a classic ESP32-WROOM-32 (esp32dev).
+# Set tech_tx_pin to the ACTUAL GPIO feeding the MAX3232 transmitter input.
+substitutions:
+  tech_tx_pin: GPIO17
+
+esphome:
+  name: tech-silent-tx
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+# A steady TTL HIGH is the idle level of the normal non-inverted UART.
+# No UART, gateway, logging, network services or protocol timers are installed.
+switch:
+  - platform: gpio
+    id: tx_idle
+    internal: true
+    pin: ${tech_tx_pin}
+    restore_mode: ALWAYS_ON
